@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script crossorigin src="https://unpkg.com/react@17/umd/react.development.js"></script> <!-- 객체 -->
+    <script crossorigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script> <!-- 객체 -->
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <link rel="stylesheet" href="../index.css" type="text/css" />
+</head>
+<body>
+    <div id="root">
+        
+    </div>
+    <script type="text/babel">
+
+        class CommentForm extends React.Component{
+
+            state = {
+                value:''
+            }
+
+            handleChange = e => {
+                const { value } = e.target
+
+                this.setState({
+                    ...this.state,
+                    value
+                })
+            }
+
+            handleSubmit = e => {
+                e.preventDefault()
+                const { insert } = this.props
+                const { value } = this.state
+
+                insert(value)
+                console.log(value)
+
+            }
+
+            render(){
+                const {
+                    total_article
+                } = this.props
+
+                const {
+                    value
+                } = this.state
+                
+                return (
+                    <li className="comment-form">
+                        <form onSubmit={this.handleSubmit}>
+                            <h4>댓글쓰기 <span>({total_article})</span></h4>
+                            <span className="ps_box">
+                                <input type="text" placeholder="댓글내용을 입력해주세요." onChange={this.handleChange} className="int" value={value}/>
+                            </span>
+                            <input type="submit" value="등록" className="btn"/>
+                        </form>
+                    </li>
+                )
+            }
+        }
+
+        class CommentList extends React.Component{
+            renderList = () => {
+                const {items} = this.props
+                return (
+                    items.map( (v,k)=>{
+                        return (
+                            <li key={k}>
+                                <ul className="comment-row">
+                                    <li className="comment-id">{v.userid}</li>
+                                    <li className="comment-content">{v.content}</li>
+                                    <li className="comment-date">{v.date}</li>
+                                </ul>
+                            </li>
+                        )
+                    } )
+                ) 
+            }
+
+            render(){
+                const {
+                    renderList
+                } = this
+                return (
+                    <React.Fragment>
+                        { renderList() }
+                    </React.Fragment>
+                )
+            }
+        } 
+
+        class Comment extends React.Component{
+            render(){
+                return(
+                    <ul className="comment">
+                        {this.props.children}
+                    </ul>
+                )
+            }
+        }
+
+        class App extends React.Component{
+
+            state = {
+                list: []
+            }
+
+            // 생명주기
+            componentDidMount(){
+                // axios 를 했다고 가정.
+                const result = [
+                    {userid:'web7722',content:'안녕하세요 댓글이에요1',date:'2022-04-15'},
+                    {userid:'web7722',content:'안녕하세요 댓글이에요2',date:'2022-04-15'},
+                    {userid:'web7722',content:'안녕하세요 댓글이에요3',date:'2022-04-15'},
+                ]
+
+                this.setState({
+                    list:result
+                })
+            }
+
+            onInsert = (data) => {
+
+                const item = {userid:'web7722',content:data,date:'2022-04-15'}
+                const list  = [...this.state.list,item ]
+
+                this.setState({
+                    list
+                })
+            }
+
+            render(){
+
+                const {
+                    onInsert,
+                    state:{
+                        list
+                    }
+                } = this
+
+                return(
+                    <div>
+                        <Comment>
+                            <CommentForm insert={ onInsert } total_article={ list.length }/>
+                            <CommentList items={ list } />
+                        </Comment>
+                    </div>
+                )
+            }
+        }
+
+        ReactDOM.render(
+            <App />,
+            document.querySelector('#root')
+        )
+    </script>
+</body>
+</html>
